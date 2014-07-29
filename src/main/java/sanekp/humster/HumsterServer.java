@@ -2,12 +2,11 @@ package sanekp.humster;
 
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.buffer.PooledByteBufAllocator;
-import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelOption;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
-import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
+import sanekp.humster.netty.ServerInitializer;
 
 /**
  * Created by sanek_000 on 7/25/2014.
@@ -22,12 +21,7 @@ public class HumsterServer {
             ServerBootstrap bootstrap = new ServerBootstrap();
             bootstrap.group(bossGroup, workerGroup)
                     .channel(NioServerSocketChannel.class)
-                    .childHandler(new ChannelInitializer<SocketChannel>() {
-                        @Override
-                        protected void initChannel(SocketChannel ch) throws Exception {
-
-                        }
-                    })
+                    .childHandler(new ServerInitializer())
                     .childOption(ChannelOption.ALLOCATOR, PooledByteBufAllocator.DEFAULT)
                     .bind(PORT)
                     .sync()
