@@ -5,7 +5,10 @@ import io.netty.channel.ChannelPipeline;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.handler.codec.http.HttpServerCodec;
 import io.netty.handler.traffic.ChannelTrafficShapingHandler;
+import sanekp.humster.servlet.HelloServlet;
+import sanekp.humster.servlet.RedirectServlet;
 import sanekp.humster.servlet.ServletContainer;
+import sanekp.humster.servlet.StatusServlet;
 import sanekp.humster.statistics.Statistics;
 
 /**
@@ -20,6 +23,12 @@ public class ServerInitializer extends ChannelInitializer<SocketChannel> {
     }
 
     private ServerHandler serverHandler = new ServerHandler(servletContainer);  //  stateless
+
+    public ServerInitializer() {
+        servletContainer.load(HelloServlet.class);
+        servletContainer.load(RedirectServlet.class);
+        servletContainer.load(StatusServlet.class);
+    }
 
     @Override
     protected void initChannel(SocketChannel socketChannel) throws Exception {

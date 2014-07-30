@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Status</title>
+    <style type="text/css">
+        html, body {
+            margin: 0;
+            font-family: Georgia, serif;
+        }
+
+        section {
+            background-color: ghostwhite;
+            margin: 10px;
+            padding: 1px 20px;
+            border-radius: 25px;
+        }
+
+        table, td, th {
+            border: 1px solid gray;
+        }
+
+        pre {
+            margin: 0;
+        }
+    </style>
+</head>
+<body>
+<main>
+    <section>
+        <h1>Статистика</h1>
+
+        <p>Общее количество запросов: ${totalQueries}</p>
+
+        <p>Количество уникальных запросов (по одному на IP): ${uniqueQueries.size}</p>
+        <table>
+            <caption>Счетчик запросов на каждый IP в виде таблицы с колонкам</caption>
+            <thead>
+            <tr>
+                <th>IP</th>
+                <th>Кол-во запросов</th>
+                <th>Время последнего запроса</th>
+            </tr>
+            </thead>
+            <tbody>
+            ${uniqueQueries}
+            </tbody>
+        </table>
+        <br/>
+        <table>
+            <caption>Количество переадресаций по url'ам в виде таблицы</caption>
+            <thead>
+            <tr>
+                <th>URL</th>
+                <th>Кол-во переадресаций</th>
+            </tr>
+            </thead>
+            <tbody>
+            ${redirects}
+            </tbody>
+        </table>
+        <p>Количество соединений, открытых в данный момент: ${activeConnections}</p>
+        <table>
+            <caption>В виде таблицы лог из 16 последних обработанных соединений</caption>
+            <thead>
+            <tr>
+                <th>src_ip</th>
+                <th>URI</th>
+                <th>timestamp</th>
+                <th>sent_bytes</th>
+                <th>received_bytes</th>
+                <th>speed (bytes/sec)</th>
+            </tr>
+            </thead>
+            <tbody>
+            ${connections}
+            </tbody>
+        </table>
+        <br/>
+    </section>
+</main>
+</body>
+</html>
