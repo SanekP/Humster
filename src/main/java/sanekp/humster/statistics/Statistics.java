@@ -1,11 +1,9 @@
 package sanekp.humster.statistics;
 
 import java.net.InetSocketAddress;
-import java.sql.Timestamp;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
+import java.util.LinkedList;
 import java.util.Map;
+import java.util.Queue;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -13,17 +11,12 @@ import java.util.concurrent.atomic.AtomicLong;
  * Created by sanek_000 on 7/27/2014.
  */
 public class Statistics {
+    private static final int MAX_QUEUE = 16;
     private final Map<String, ClientInfo> uniqueQueries = new ConcurrentHashMap<>();
-    private final Map<String, AtomicLong> redirects = Collections.synchronizedMap(new HashMap<String, AtomicLong>());
+    private final Map<String, AtomicLong> redirects = new ConcurrentHashMap<>();
+    private final Queue<ConnectionInfo> connectionsInfo = new LinkedList<>();
     private AtomicLong totalQueries = new AtomicLong(0);
     private AtomicLong activeConnections = new AtomicLong(0);
-    private Map<Timestamp, ConnectionInfo> connectionsInfo = Collections.synchronizedMap(
-            new LinkedHashMap<Timestamp, ConnectionInfo>() {
-                @Override
-                protected boolean removeEldestEntry(Map.Entry<Timestamp, ConnectionInfo> eldest) {
-                    return size() > 16; //  limit size
-                }
-            }); //  keys are used only
 
     public void addRedirect(String url) {
         AtomicLong atomicLong;
@@ -81,10 +74,20 @@ public class Statistics {
     }
 
     public void addConnection(ConnectionInfo connectionInfo) {
-        connectionsInfo.put(connectionInfo.getTimestamp(), connectionInfo);
+        synchronized (connectionsInfo) {
+            connectionsInfo.add(connectionInfo);
+            if (connectionsInfo.size() > MAX_QUEUE) {
+                connectionsInfo.remove();
+            }
+        }
     }
 
-    public Map<Timestamp, ConnectionInfo> getConnectionsInfo() {
+    /**
+     * Access to this have to be synchronized
+     *
+     * @return queue of 16 last connections
+     */
+    public Queue<ConnectionInfo> getConnectionsInfo() {
         return connectionsInfo;
     }
 }

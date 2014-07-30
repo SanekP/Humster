@@ -12,6 +12,7 @@ import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
 import java.text.DecimalFormat;
 import java.util.Map;
+import java.util.Queue;
 import java.util.concurrent.atomic.AtomicLong;
 
 /**
@@ -77,20 +78,23 @@ public class StatusServlet extends HttpServlet {
         }
         String redirectsTable = stringBuilder.toString();
         stringBuilder.setLength(0);
-        for (ConnectionInfo connectionInfo : statistics.getConnectionsInfo().values()) {
-            stringBuilder.append("<tr><td>");
-            stringBuilder.append(connectionInfo.getIp());
-            stringBuilder.append("</td><td><pre>");
-            stringBuilder.append(connectionInfo.getUri());
-            stringBuilder.append("</pre></td><td>");
-            stringBuilder.append(connectionInfo.getTimestamp());
-            stringBuilder.append("</td><td>");
-            stringBuilder.append(connectionInfo.getSent());
-            stringBuilder.append("</td><td>");
-            stringBuilder.append(connectionInfo.getReceived());
-            stringBuilder.append("</td><td>");
-            stringBuilder.append(decimalFormat.format(connectionInfo.getSpeed()));
-            stringBuilder.append("</td></tr>\n");
+        Queue<ConnectionInfo> connectionsInfo = statistics.getConnectionsInfo();
+        synchronized (connectionsInfo) {
+            for (ConnectionInfo connectionInfo : connectionsInfo) {
+                stringBuilder.append("<tr><td>");
+                stringBuilder.append(connectionInfo.getIp());
+                stringBuilder.append("</td><td><pre>");
+                stringBuilder.append(connectionInfo.getUri());
+                stringBuilder.append("</pre></td><td>");
+                stringBuilder.append(connectionInfo.getTimestamp());
+                stringBuilder.append("</td><td>");
+                stringBuilder.append(connectionInfo.getSent());
+                stringBuilder.append("</td><td>");
+                stringBuilder.append(connectionInfo.getReceived());
+                stringBuilder.append("</td><td>");
+                stringBuilder.append(decimalFormat.format(connectionInfo.getSpeed()));
+                stringBuilder.append("</td></tr>\n");
+            }
         }
         String connectionsTable = stringBuilder.toString();
         String page = template
